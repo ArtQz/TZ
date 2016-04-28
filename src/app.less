@@ -1,0 +1,81 @@
+html, body {
+  font-family: "Segoe UI",Helvetica,Arial,sans-serif;
+  font-size: 14px;
+  line-height: 20px;
+  color: #404040;
+  background: #fff;
+  margin: 0;
+  padding: 0;
+}
+input.tz {
+  width: 40px;
+  height: 35px;
+  text-align: center;
+}
+.statusBar {
+  display: inline-block;
+  height: 100vh;
+}
+.bracket {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  display: inline-block;
+  border: 2px solid;
+  width: 4px;
+}
+
+.bracket.left {
+  border-right: 0;
+  left: 0;
+}
+.bracket.right {
+  border-left: 0;
+  right: 0;
+}
+
+button.result {
+  border: 1px solid rgba(26,103,6,0.3);
+  border-bottom-color: rgba(26,103,6,0.7);
+  border-radius: 2px;
+  background: linear-gradient(to bottom, #4ba91d 0%, #38920c 100%);
+  color: white;
+  padding: 9px 10px;
+  font-size: 14px;
+  cursor: pointer;
+}
+button.result:hover {
+  background: linear-gradient(to bottom, #3b8d13 0%, #317e0b 100%);
+  border-bottom-color: rgba(26,103,6,0.7);
+}
+
+button.default {
+  border: 1px solid rgba(0,0,0,0.3);
+  border-bottom-color: rgba(0,0,0,0.4);
+  border-radius: 2px;
+  background: linear-gradient(to bottom, #fefefe 0%, #ececec 100%);
+  color: #404040;
+  padding: 9px 10px;
+  font-size: 14px;
+  margin: 5px;
+  cursor: pointer;
+}
+button.default:hover {
+  background: linear-gradient(to bottom, #f2f2f2 0%, #dfdfdf 100%);
+  border-bottom-color: rgba(0,0,0,0.4);
+}
+button.default:focus {
+  border: 1px solid white;
+}
+button:disabled {
+  background: #f2f2f2;
+  color: #808080;
+  border: 1px solid rgba(0,0,0,0.3);
+  border-bottom-color: rgba(0,0,0,0.3);
+}
+button:disabled:hover {
+  background: #f2f2f2;
+  color: #808080;
+  cursor: not-allowed;
+  border-bottom-color: rgba(0,0,0,0.3);
+}
