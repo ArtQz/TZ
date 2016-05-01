@@ -19,7 +19,6 @@ function statusButton(arrayLength) {
 
   if (arrayLength == 10) {
     status['addButton'] = 'disabled';
-    status['deleteButton'] = null;
   }
   else {
     status['addButton'] = null;
@@ -56,12 +55,8 @@ var dataTableB = [
     [0, 1],
     [0, 1],
 ]
-//таблица C
-var dataTableC = [
-    [0, 1],
-    [0, 1],
-]
-const values = {};
+
+//const values = {};
 
 var TableA = React.createClass({
   getInitialState() {
@@ -154,16 +149,6 @@ var TableA = React.createClass({
     //добавляем строку
     if (array.length <= 9) {
     array.push(index);
-    //добавляем строку в таблицу Ц
-    if (this.state.matrix == 'a') {
-      var lastRowTableC = this.props.dataTableC[this.props.dataTableC.length - 1];
-      var indexTableC = [];
-      for(var i=0; i<lastRowTableC.length; i++) {
-        indexTableC[i] = i;
-      }
-
-      this.props.dataTableC.push(indexTableC);
-    }
 
     this.setState({
       data: array,
@@ -185,13 +170,7 @@ var TableA = React.createClass({
       for(var i=0; i<array.length; i++) {
         array[i].push(lastColumn + 1);
       }
-      //добавляем колонку в таблицу Ц
-      if (this.state.matrix == 'b') {
-        for(var i=0; i<this.props.dataTableC.length; i++) {
-           this.props.dataTableC[i].push(lastColumn + 1);
-        }
-      }
-      console.log(this.props.dataTableC);
+
       this.setState({
         data: array,
         addColumnStatus: statusButton(array[0].length)['addButton'],
@@ -247,7 +226,7 @@ var TableA = React.createClass({
       });
     }
   },
-  Result() {
+  Result(values) {
 
     for(var i=0; i<this.props.dataTableA.length; i++){
       for(var j=0; j<this.props.dataTableB[0].length; j++){
@@ -261,8 +240,8 @@ var TableA = React.createClass({
           sum += this.refs[keyA].props.value * this.refs[keyB].props.value;
 
         }
-        values[keyC] = sum;
 
+        values[keyC] = sum;
         this.setState({values});
         console.log(statusBar(this.props.dataTableA, this.props.dataTableB)['style']);
       }
@@ -297,7 +276,8 @@ var TableA = React.createClass({
 
     this.setState({values});
   },
-  handleChange(fieldName, e) {
+  handleChange(fieldName, values, e) {
+    var values = values;
     var cellValue = e.target.value
                     .replace(/[^\d\.\,]/g, '')
                     .replace(',', '.')
@@ -305,19 +285,32 @@ var TableA = React.createClass({
     if (+cellValue >= 10) {
       cellValue = 10;
     }
+
+
     values[fieldName] = cellValue;
+    console.log(values);
+
     this.setState({values});
+      console.log(this);
   },
   render: function() {
     var arrayTableA = this.props.dataTableA;
     var arrayTableB = this.props.dataTableB;
-    var arrayTableC = this.props.dataTableC;
-    console.log(this.state.deleteColumnStatus);
+    //генерируем таблицу Ц
+    var arrayTableCRow = [], arrayTableCColumn = [];
+    for(var i=0; i<this.props.dataTableA.length; i++){
+      for(var j=0; j<this.props.dataTableB[0].length; j++){
+        arrayTableCColumn[j] = j;
+      }
+      arrayTableCRow[i] = arrayTableCColumn;
+    }
+    var arrayTableC = arrayTableCRow;
+    const values = {...this.state.values};
     return (
       <div>
         <div style={this.state.statusBarStyle} className="statusBar">
           <div style={{textAlign: 'left', padding: '15px 55px'}}>
-            <button className="result" onClick={this.Result}>Умножить матрицы</button>
+            <button className="result" onClick={this.Result.bind(this, values)}>Умножить матрицы</button>
           </div>
           <div style={{textAlign: 'left', padding: '15px 50px'}}>
             <button className="default" onClick={this.clearMatrix}>Очистить матрицы</button><br/>
@@ -387,7 +380,7 @@ var TableA = React.createClass({
                                 placeholder={'a' + (rowIndex+1) +',' + (cellIndex+1)}
                                 className="tz"
                                 value={values[cellName]}
-                                onChange={this.handleChange.bind(this, cellName)} />
+                                onChange={this.handleChange.bind(this, cellName, values)} />
                               </td>
                             );
                           })}
@@ -416,7 +409,7 @@ var TableA = React.createClass({
                                 placeholder={'b' + (rowIndex+1) +',' + (cellIndex+1)}
                                 className="tz"
                                 value={values[cellName]}
-                                onChange={this.handleChange.bind(this, cellName)} />
+                                onChange={this.handleChange.bind(this, cellName, values)} />
                               </td>
                             );
                           })}
@@ -441,7 +434,7 @@ var App = React.createClass({
 
         return (
             <div>
-              <TableA dataTableA={dataTableA} dataTableB={dataTableB} dataTableC={dataTableC}/>
+              <TableA dataTableA={dataTableA} dataTableB={dataTableB} />
             </div>
         )
     }
