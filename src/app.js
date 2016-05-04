@@ -2,49 +2,6 @@
 import React from 'react';
 import './app.less';
 
-function statusBar (tableA, tableB) {
-  var statusBar = {};
-  if (tableA[0].length == tableB.length) {
-    statusBar['style'] = {'background': '#5199db'};
-  }
-  else {
-    statusBar['style'] = {'background': '#f6c1c0'};
-    statusBar['text'] = 'Такие матрицы нельзя перемножить, так как количество столбцов матрицы А не равно количеству строк матрицы В.';
-  }
-  return statusBar;
-}
-//доступность кнопки
-function statusButton(arrayLength) {
-  var status = {};
-
-  if (arrayLength == 10) {
-    status['addButton'] = 'disabled';
-  }
-  else {
-    status['addButton'] = null;
-  }
-
-  if (arrayLength == 2) {
-    status['deleteButton'] = 'disabled';
-    status['addButton'] = null;
-  }
-  else {
-    status['deleteButton'] = null;
-  }
-
-  return status;
-}
-
-//Проверка на выбранную матрицу
-function currentTarget(matrix, tableA, tableB) {
-  var array;
-  //проверяем какая матрица выбрана
-  if (matrix == 'a') {
-    array = tableA;
-  } else if (matrix == 'b') array = tableB;
-  return array;
-}
-
 //таблица A
 var dataTableA = [
     [0, 1],
@@ -56,8 +13,6 @@ var dataTableB = [
     [0, 1],
 ]
 
-//const values = {};
-
 var TableA = React.createClass({
   getInitialState() {
     return {
@@ -67,7 +22,6 @@ var TableA = React.createClass({
       addRowStatus: 'disabled',
       addColumnStatus: 'disabled',
       matrix: '',
-      inputCell: '',
       values: {},
       statusBarStyle: {'background': '#bcbcbc'},
       statusBarText: ''
@@ -132,12 +86,9 @@ var TableA = React.createClass({
         addColumnStatus: null
       })
     }
-    console.log('пидор выбрал матрицу: ' + e.currentTarget.value + ', в которой:');
-    console.log('Количество строк: ' + array.length);
-    console.log('Количество колонок: ' + array[0].length);
   },
   addRow() {
-    var array = currentTarget(this.state.matrix, this.props.dataTableA, this.props.dataTableB);
+    var array = this.currentTarget(this.state.matrix, this.props.dataTableA, this.props.dataTableB);
 
     //последняя сртока
     var lastRow = array[array.length - 1];
@@ -153,15 +104,15 @@ var TableA = React.createClass({
     this.setState({
       data: array,
       deleteRowStatus: null,
-      addRowStatus: statusButton(array.length)['addButton'],
-      deleteRowStatus: statusButton(array.length)['addDelete'],
-      statusBarStyle: statusBar(this.props.dataTableA, this.props.dataTableB)['style'],
-      statusBarText: statusBar(this.props.dataTableA, this.props.dataTableB)['text'],
+      addRowStatus: this.statusButton(array.length)['addButton'],
+      deleteRowStatus: this.statusButton(array.length)['addDelete'],
+      statusBarStyle: this.statusBar(this.props.dataTableA, this.props.dataTableB)['style'],
+      statusBarText: this.statusBar(this.props.dataTableA, this.props.dataTableB)['text'],
     });
     }
   },
   addColumn() {
-    var array = currentTarget(this.state.matrix, this.props.dataTableA, this.props.dataTableB);
+    var array = this.currentTarget(this.state.matrix, this.props.dataTableA, this.props.dataTableB);
 
     //находим последнюю колонку
     var lastColumn = array[0][array[0].length -1]
@@ -173,56 +124,47 @@ var TableA = React.createClass({
 
       this.setState({
         data: array,
-        addColumnStatus: statusButton(array[0].length)['addButton'],
-        deleteColumnStatus: statusButton(array[0].length)['deleteButton'],
-        statusBarStyle: statusBar(this.props.dataTableA, this.props.dataTableB)['style'],
-        statusBarText: statusBar(this.props.dataTableA, this.props.dataTableB)['text'],
+        addColumnStatus: this.statusButton(array[0].length)['addButton'],
+        deleteColumnStatus: this.statusButton(array[0].length)['deleteButton'],
+        statusBarStyle: this.statusBar(this.props.dataTableA, this.props.dataTableB)['style'],
+        statusBarText: this.statusBar(this.props.dataTableA, this.props.dataTableB)['text'],
       });
     }
   },
   deleteRow() {
-    var array = currentTarget(this.state.matrix, this.props.dataTableA, this.props.dataTableB);
+    var array = this.currentTarget(this.state.matrix, this.props.dataTableA, this.props.dataTableB);
 
     //последняя сртока
     var lastRow = array[array.length - 1];
-    //удаляем последнюю сртока
+    //удаляем последнюю сртоку
     if (array.length >= 3) {
       array.pop();
-      if (this.state.matrix == 'a') {
-        this.props.dataTableC.pop();
-      }
     }
 
     this.setState({
-      addRowStatus: statusButton(array.length)['addButton'],
-      deleteRowStatus: statusButton(array.length)['deleteButton'],
-      statusBarStyle: statusBar(this.props.dataTableA, this.props.dataTableB)['style'],
-      statusBarText: statusBar(this.props.dataTableA, this.props.dataTableB)['text'],
+      addRowStatus: this.statusButton(array.length)['addButton'],
+      deleteRowStatus: this.statusButton(array.length)['deleteButton'],
+      statusBarStyle: this.statusBar(this.props.dataTableA, this.props.dataTableB)['style'],
+      statusBarText: this.statusBar(this.props.dataTableA, this.props.dataTableB)['text'],
     });
   },
   deleteColumn() {
-    var array = currentTarget(this.state.matrix, this.props.dataTableA, this.props.dataTableB);
+    var array = this.currentTarget(this.state.matrix, this.props.dataTableA, this.props.dataTableB);
 
     //последняя колонка
     var lastColumn = array[0][array[0].length -1]
 
     //удаляем колонку
     if (lastColumn >= 2) {
-      if (this.state.matrix == 'b') {
-        for(var i=0; i<this.props.dataTableC.length; i++) {
-          this.props.dataTableC[i].pop();
-        }
-      }
       for(var i=0; i<array.length; i++) {
         array[i].pop();
       }
-      console.log(array[0].length);
       this.setState({
         data: array,
-        addColumnStatus: statusButton(array[0].length)['addButton'],
-        deleteColumnStatus: statusButton(array[0].length)['deleteButton'],
-        statusBarStyle: statusBar(this.props.dataTableA, this.props.dataTableB)['style'],
-        statusBarText: statusBar(this.props.dataTableA, this.props.dataTableB)['text'],
+        addColumnStatus: this.statusButton(array[0].length)['addButton'],
+        deleteColumnStatus: this.statusButton(array[0].length)['deleteButton'],
+        statusBarStyle: this.statusBar(this.props.dataTableA, this.props.dataTableB)['style'],
+        statusBarText: this.statusBar(this.props.dataTableA, this.props.dataTableB)['text'],
       });
     }
   },
@@ -243,17 +185,16 @@ var TableA = React.createClass({
 
         values[keyC] = sum;
         this.setState({values});
-        console.log(statusBar(this.props.dataTableA, this.props.dataTableB)['style']);
       }
     }
   },
-  clearMatrix() {
+  clearMatrix(values) {
     for (var key in values) {
       values[key] = '';
     }
     this.setState({values});
   },
-  toChangeMatrix() {
+  toChangeMatrix(values) {
     var valuesA = {};
     var valuesB = {};
     for (var key in values) {
@@ -288,16 +229,56 @@ var TableA = React.createClass({
 
 
     values[fieldName] = cellValue;
-    console.log(values);
 
     this.setState({values});
-      console.log(this);
+  },
+  //Проверка на выбранную матрицу
+  currentTarget(matrix, tableA, tableB) {
+    var array;
+    //проверяем какая матрица выбрана
+    if (matrix == 'a') {
+      array = tableA;
+    } else if (matrix == 'b') array = tableB;
+    return array;
+  },
+  //доступность кнопки
+  statusButton(arrayLength) {
+    var status = {};
+
+    if (arrayLength == 10) {
+      status['addButton'] = 'disabled';
+    }
+    else {
+      status['addButton'] = null;
+    }
+
+    if (arrayLength == 2) {
+      status['deleteButton'] = 'disabled';
+      status['addButton'] = null;
+    }
+    else {
+      status['deleteButton'] = null;
+    }
+
+    return status;
+  },
+  statusBar (tableA, tableB) {
+    var statusBar = {};
+    if (tableA[0].length == tableB.length) {
+      statusBar['style'] = {'background': '#5199db'};
+    }
+    else {
+      statusBar['style'] = {'background': '#f6c1c0'};
+      statusBar['text'] = 'Такие матрицы нельзя перемножить, так как количество столбцов матрицы А не равно количеству строк матрицы В.';
+    }
+    return statusBar;
   },
   render: function() {
     var arrayTableA = this.props.dataTableA;
     var arrayTableB = this.props.dataTableB;
     //генерируем таблицу Ц
-    var arrayTableCRow = [], arrayTableCColumn = [];
+    var arrayTableCRow = [],
+        arrayTableCColumn = [];
     for(var i=0; i<this.props.dataTableA.length; i++){
       for(var j=0; j<this.props.dataTableB[0].length; j++){
         arrayTableCColumn[j] = j;
@@ -306,6 +287,7 @@ var TableA = React.createClass({
     }
     var arrayTableC = arrayTableCRow;
     const values = {...this.state.values};
+
     return (
       <div>
         <div style={this.state.statusBarStyle} className="statusBar">
@@ -313,8 +295,8 @@ var TableA = React.createClass({
             <button className="result" onClick={this.Result.bind(this, values)}>Умножить матрицы</button>
           </div>
           <div style={{textAlign: 'left', padding: '15px 50px'}}>
-            <button className="default" onClick={this.clearMatrix}>Очистить матрицы</button><br/>
-            <button className="default" onClick={this.toChangeMatrix}>Поменять матрицы местами</button>
+            <button className="default" onClick={this.clearMatrix.bind(this, values)}>Очистить матрицы</button><br/>
+            <button className="default" onClick={this.toChangeMatrix.bind(this, values)}>Поменять матрицы местами</button>
           </div>
           <div style={{textAlign: 'left', padding: '15px 50px'}}>
             <input onChange={this.onMatrixChanged} type="radio" name="matrix" value="a" />
