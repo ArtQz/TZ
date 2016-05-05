@@ -28,10 +28,10 @@ var Calculator = React.createClass({
 
     //добавляем строку
     if (array.length <= 9) {
-    array.push(index);
+      array.push(index);
 
-    this.setState({
-    });
+      this.setState({
+      });
     }
   },
   addColumn() {
@@ -79,6 +79,8 @@ var Calculator = React.createClass({
   },
   Result(values) {
 
+    console.log(values);
+    /*
     for(var i=0; i<this.state.matrixA.length; i++){
       for(var j=0; j<this.state.matrixB[0].length; j++){
 
@@ -96,6 +98,7 @@ var Calculator = React.createClass({
         this.setState({values});
       }
     }
+    */
   },
   clearMatrix(values) {
     for (var key in values) {
@@ -104,8 +107,33 @@ var Calculator = React.createClass({
     this.setState({values});
   },
   toChangeMatrix(values) {
-    var valuesA = {};
-    var valuesB = {};
+    var valuesA = {},
+        valuesB = {},
+        tempMatrixA = [],
+        tempMatrixB = [],
+        matrixARow = [],
+        matrixAColumn = [],
+        matrixBRow = [],
+        matrixBColumn = [];
+
+    for (var i = 0; i < this.state.matrixA[0].length; i++) {
+      for (var j = 0; j < this.state.matrixA.length; j++) {
+        matrixAColumn[j] = j;
+      }
+      matrixARow[i] = matrixAColumn;
+    }
+    tempMatrixB = matrixARow;
+
+    for (var i = 0; i < this.state.matrixB[0].length; i++) {
+      for (var j = 0; j < this.state.matrixB.length; j++) {
+        matrixBColumn[j] = j;
+      }
+      matrixBRow[i] = matrixBColumn;
+    }
+    tempMatrixA = matrixBRow;
+
+    console.log(tempMatrixA,tempMatrixB);
+
     for (var key in values) {
       if (key.replace(/(\w{1})(\d{1}):(\d{1})/, '$1') == 'a') {
         var keyA = key.replace(/(\w{1})(\d{1}):(\d{1})/, "b$3:$2");
@@ -124,7 +152,7 @@ var Calculator = React.createClass({
       values[keyB] = valuesB[keyB];
     }
 
-    this.setState({values});
+    this.setState({values, matrixA:tempMatrixA, matrixB:tempMatrixB});
   },
   handleChange(fieldName, values, e) {
     var values = values;
