@@ -2,34 +2,22 @@
 import React from 'react';
 import './app.less';
 
-//таблица A
-var dataTableA = [
-    [0, 1],
-    [0, 1],
-]
-//таблица B
-var dataTableB = [
-    [0, 1],
-    [0, 1],
-]
-
-var TableA = React.createClass({
+var Calculator = React.createClass({
   getInitialState() {
     return {
-      data: this.props.dataTableA,
-      matrix: null,
+      matrixA: [[0,1],[0,1]],
+      matrixB: [[0,1],[0,1]],
+      matrixTarget: null,
       values: {},
-      statusBarStyle: {'background': '#bcbcbc'},
-      statusBarText: ''
     };
   },
   onMatrixChanged(e) {
     this.setState({
-      matrix: e.currentTarget.value,
+      matrixTarget: e.currentTarget.value,
     });
   },
   addRow() {
-    var array = this.currentTarget(this.state.matrix, this.props.dataTableA, this.props.dataTableB);
+    var array = this.currentTarget(this.state.matrixTarget, this.state.matrixA, this.state.matrixB);
 
     //последняя сртока
     var lastRow = array[array.length - 1];
@@ -43,12 +31,11 @@ var TableA = React.createClass({
     array.push(index);
 
     this.setState({
-      data: array,
     });
     }
   },
   addColumn() {
-    var array = this.currentTarget(this.state.matrix, this.props.dataTableA, this.props.dataTableB);
+    var array = this.currentTarget(this.state.matrixTarget, this.state.matrixA, this.state.matrixB);
 
     //находим последнюю колонку
     var lastColumn = array[0][array[0].length -1]
@@ -59,12 +46,11 @@ var TableA = React.createClass({
       }
 
       this.setState({
-        data: array,
       });
     }
   },
   deleteRow() {
-    var array = this.currentTarget(this.state.matrix, this.props.dataTableA, this.props.dataTableB);
+    var array = this.currentTarget(this.state.matrixTarget, this.state.matrixA, this.state.matrixB);
 
     //последняя сртока
     var lastRow = array[array.length - 1];
@@ -77,7 +63,7 @@ var TableA = React.createClass({
     });
   },
   deleteColumn() {
-    var array = this.currentTarget(this.state.matrix, this.props.dataTableA, this.props.dataTableB);
+    var array = this.currentTarget(this.state.matrixTarget, this.state.matrixA, this.state.matrixB);
 
     //последняя колонка
     var lastColumn = array[0][array[0].length -1]
@@ -88,17 +74,16 @@ var TableA = React.createClass({
         array[i].pop();
       }
       this.setState({
-        data: array,
       });
     }
   },
   Result(values) {
 
-    for(var i=0; i<this.props.dataTableA.length; i++){
-      for(var j=0; j<this.props.dataTableB[0].length; j++){
+    for(var i=0; i<this.state.matrixA.length; i++){
+      for(var j=0; j<this.state.matrixB[0].length; j++){
 
         var sum = 0;
-        for(var k=0; k<this.props.dataTableA[i].length; k++){
+        for(var k=0; k<this.state.matrixA[i].length; k++){
           var keyA = 'a' + (i+1) +'_'+ (k+1);
           var keyB = 'b' + (k+1) +'_'+ (j+1);
           var keyC = 'c' + (i+1) +':'+ (j+1);
@@ -166,13 +151,13 @@ var TableA = React.createClass({
     return array;
   },
   render: function() {
-    var arrayTableA = this.props.dataTableA;
-    var arrayTableB = this.props.dataTableB;
+    var arrayTableA = this.state.matrixA;
+    var arrayTableB = this.state.matrixB;
     //генерируем таблицу Ц
     var arrayTableCRow = [],
         arrayTableCColumn = [];
-    for(var i=0; i<this.props.dataTableA.length; i++){
-      for(var j=0; j<this.props.dataTableB[0].length; j++){
+    for(var i=0; i<this.state.matrixA.length; i++){
+      for(var j=0; j<this.state.matrixB[0].length; j++){
         arrayTableCColumn[j] = j;
       }
       arrayTableCRow[i] = arrayTableCColumn;
@@ -221,10 +206,10 @@ var TableA = React.createClass({
       return status;
     }
     var statusButtonAddRow, statusButtonDeleteRow, statusButtonAddColumn, statusButtonDeleteColumn;
-    statusButtonAddRow = statusButton(this.state.matrix, arrayTableA, arrayTableB)['addButton'];
-    statusButtonDeleteRow = statusButton(this.state.matrix, arrayTableA, arrayTableB)['deleteButton'];
-    statusButtonAddColumn = statusButton(this.state.matrix, arrayTableA[0], arrayTableB[0])['addButton'];
-    statusButtonDeleteColumn = statusButton(this.state.matrix, arrayTableA[0], arrayTableB[0])['deleteButton'];
+    statusButtonAddRow = statusButton(this.state.matrixTarget, arrayTableA, arrayTableB)['addButton'];
+    statusButtonDeleteRow = statusButton(this.state.matrixTarget, arrayTableA, arrayTableB)['deleteButton'];
+    statusButtonAddColumn = statusButton(this.state.matrixTarget, arrayTableA[0], arrayTableB[0])['addButton'];
+    statusButtonDeleteColumn = statusButton(this.state.matrixTarget, arrayTableA[0], arrayTableB[0])['deleteButton'];
 
     //определяем статус кнопок
     function statusBar (tableA, tableB) {
@@ -367,7 +352,7 @@ var App = React.createClass({
 
         return (
             <div>
-              <TableA dataTableA={dataTableA} dataTableB={dataTableB} />
+              <Calculator />
             </div>
         )
     }
