@@ -106,12 +106,16 @@ var Calculator = React.createClass({
   },
   handleChange(matrixName, rowIndex, columnIndex, e) {
     var matrixA = this.state.matrixA,
-        matrixB = this.state.matrixB;
+        matrixB = this.state.matrixB,
+        value = e.target.value.replace(/[^\d\.\,]/g, '').replace(',', '.');
+    if(+value >= 10){
+      value = 10;
+    }
     if(matrixName == 'matrixA') {
-      matrixA[rowIndex][columnIndex] = +e.target.value;
+      matrixA[rowIndex][columnIndex] = value;
     }
     else {
-      matrixB[rowIndex][columnIndex] = +e.target.value;
+      matrixB[rowIndex][columnIndex] = value;
     }
     this.setState({matrixB, matrixA});
   },
