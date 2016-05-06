@@ -5,44 +5,57 @@ import './app.less';
 var Calculator = React.createClass({
   getInitialState() {
     return {
-      matrixA: [[0,1],[0,1]],
-      matrixB: [[0,1],[0,1]],
+      matrixA: [[null,null],[null,null]],
+      matrixB: [[null,null],[null,null]],
+      result: {},
       matrixTarget: null,
-      values: {},
     };
   },
   onMatrixChanged(e) {
     this.setState({
-      matrixTarget: e.currentTarget.value,
+      matrixTarget: e.target.value,
     });
   },
   addRow() {
-    var array = this.currentTarget(this.state.matrixTarget, this.state.matrixA, this.state.matrixB);
-
-    //последняя сртока
-    var lastRow = array[array.length - 1];
-    var index = [];
-    for(var i=0; i<lastRow.length; i++) {
-      index[i] = i;
+    var matrixA = this.state.matrixA,
+        matrixB = this.state.matrixB,
+        matrixTarget = this.state.matrixTarget,
+        matrix;
+    if(matrixTarget == 'a') {
+      matrix = matrixA;
     }
-
+    else if (matrixTarget == 'b') {
+      matrix = matrixB;
+    }
+    //находим последнюю строку
+    var matrixLastRow = matrix[matrix.length - 1];
+    var index = [];
+    for(var i = 0; i < matrixLastRow.length; i++) {
+      index[i] = null;
+    }
     //добавляем строку
-    if (array.length <= 9) {
-      array.push(index);
+    if (matrix.length <= 9) {
+      matrix.push(index);
 
       this.setState({
       });
     }
   },
   addColumn() {
-    var array = this.currentTarget(this.state.matrixTarget, this.state.matrixA, this.state.matrixB);
-
-    //находим последнюю колонку
-    var lastColumn = array[0][array[0].length -1]
+    var matrixA = this.state.matrixA,
+        matrixB = this.state.matrixB,
+        matrixTarget = this.state.matrixTarget,
+        matrix;
+    if(matrixTarget == 'a') {
+      matrix = matrixA;
+    }
+    else if (matrixTarget == 'b') {
+      matrix = matrixB;
+    }
     //добавляем колонку
-    if (lastColumn <= 8) {
-      for(var i=0; i<array.length; i++) {
-        array[i].push(lastColumn + 1);
+    if (matrix[0].length <= 9) {
+      for(var i = 0; i < matrix.length; i++) {
+        matrix[i].push(null);
       }
 
       this.setState({
@@ -50,180 +63,149 @@ var Calculator = React.createClass({
     }
   },
   deleteRow() {
-    var array = this.currentTarget(this.state.matrixTarget, this.state.matrixA, this.state.matrixB);
+    var matrixA = this.state.matrixA,
+        matrixB = this.state.matrixB,
+        matrixTarget = this.state.matrixTarget,
+        matrix;
+    if(matrixTarget == 'a') {
+      matrix = matrixA;
+    }
+    else if (matrixTarget == 'b') {
+      matrix = matrixB;
+    }
 
     //последняя сртока
-    var lastRow = array[array.length - 1];
+    var lastRow = matrix[matrix.length - 1];
     //удаляем последнюю сртоку
-    if (array.length >= 3) {
-      array.pop();
+    if (matrix.length >= 3) {
+      matrix.pop();
     }
 
     this.setState({
     });
   },
   deleteColumn() {
-    var array = this.currentTarget(this.state.matrixTarget, this.state.matrixA, this.state.matrixB);
-
-    //последняя колонка
-    var lastColumn = array[0][array[0].length -1]
-
+    var matrixA = this.state.matrixA,
+        matrixB = this.state.matrixB,
+        matrixTarget = this.state.matrixTarget,
+        matrix;
+    if(matrixTarget == 'a') {
+      matrix = matrixA;
+    }
+    else if (matrixTarget == 'b') {
+      matrix = matrixB;
+    }
     //удаляем колонку
-    if (lastColumn >= 2) {
-      for(var i=0; i<array.length; i++) {
-        array[i].pop();
+    if (matrix[0].length >= 3) {
+      for(var i=0; i<matrix.length; i++) {
+        matrix[i].pop();
       }
       this.setState({
       });
     }
   },
-  Result(values) {
-
-    console.log(values);
-    /*
-    for(var i=0; i<this.state.matrixA.length; i++){
-      for(var j=0; j<this.state.matrixB[0].length; j++){
-
+  handleChange(matrixName, rowIndex, columnIndex, e) {
+    var matrixA = this.state.matrixA,
+        matrixB = this.state.matrixB;
+    if(matrixName == 'matrixA') {
+      matrixA[rowIndex][columnIndex] = +e.target.value;
+    }
+    else {
+      matrixB[rowIndex][columnIndex] = +e.target.value;
+    }
+    this.setState({matrixB, matrixA});
+  },
+  result() {
+    var matrixA = this.state.matrixA,
+        matrixB = this.state.matrixB,
+        result = this.state.result;
+    for(var i = 0; i < matrixA.length; i++) {
+      for(var j = 0; j < matrixB[0].length; j++) {
         var sum = 0;
-        for(var k=0; k<this.state.matrixA[i].length; k++){
-          var keyA = 'a' + (i+1) +'_'+ (k+1);
-          var keyB = 'b' + (k+1) +'_'+ (j+1);
-          var keyC = 'c' + (i+1) +':'+ (j+1);
-
-          sum += this.refs[keyA].props.value * this.refs[keyB].props.value;
-
+        for(var k= 0; k < matrixA[i].length; k++) {
+          sum += matrixA[i][k] * matrixB[k][j];
         }
-
-        values[keyC] = sum;
-        this.setState({values});
+        result[i+':'+j] = sum;
       }
     }
-    */
+    this.setState({result});
   },
-  clearMatrix(values) {
-    for (var key in values) {
-      values[key] = '';
+  clearMatrix() {
+    var matrixA = this.state.matrixA,
+        matrixB = this.state.matrixB,
+        result = this.state.result;
+        console.log(matrixA);
+    for(var i = 0; i < matrixA.length; i++) {
+      for(var j = 0; j < matrixA[i].length; j++) {
+        matrixA[i][j] = null;
+      }
     }
-    this.setState({values});
+    for(var i = 0; i < matrixB.length; i++) {
+      for(var j = 0; j < matrixB[i].length; j++) {
+        matrixB[i][j] = null;
+      }
+    }
+    result = {};
+    this.setState({matrixA, matrixB, result});
   },
-  toChangeMatrix(values) {
-    var valuesA = {},
-        valuesB = {},
-        tempMatrixA = [],
-        tempMatrixB = [],
-        matrixARow = [],
-        matrixAColumn = [],
-        matrixBRow = [],
-        matrixBColumn = [];
-
-    for (var i = 0; i < this.state.matrixA[0].length; i++) {
-      for (var j = 0; j < this.state.matrixA.length; j++) {
-        matrixAColumn[j] = j;
-      }
-      matrixARow[i] = matrixAColumn;
-    }
-    tempMatrixB = matrixARow;
-
-    for (var i = 0; i < this.state.matrixB[0].length; i++) {
-      for (var j = 0; j < this.state.matrixB.length; j++) {
-        matrixBColumn[j] = j;
-      }
-      matrixBRow[i] = matrixBColumn;
-    }
-    tempMatrixA = matrixBRow;
-
-    console.log(tempMatrixA,tempMatrixB);
-
-    for (var key in values) {
-      if (key.replace(/(\w{1})(\d{1}):(\d{1})/, '$1') == 'a') {
-        var keyA = key.replace(/(\w{1})(\d{1}):(\d{1})/, "b$3:$2");
-        valuesA[keyA] = values[key];
-      }
-      else if (key.replace(/(\w{1})(\d{1}):(\d{1})/, '$1') == 'b') {
-        var keyB= key.replace(/(\w{1})(\d{1}):(\d{1})/, "a$3:$2");
-        valuesB[keyB] = values[key];
-      }
-    }
-
-    for (var keyA in valuesA) {
-      values[keyA] = valuesA[keyA];
-    }
-    for (var keyB in valuesB) {
-      values[keyB] = valuesB[keyB];
-    }
-
-    this.setState({values, matrixA:tempMatrixA, matrixB:tempMatrixB});
-  },
-  handleChange(fieldName, values, e) {
-    var values = values;
-    var cellValue = e.target.value
-                    .replace(/[^\d\.\,]/g, '')
-                    .replace(',', '.')
-
-    if (+cellValue >= 10) {
-      cellValue = 10;
-    }
-
-
-    values[fieldName] = cellValue;
-
-    this.setState({values});
-  },
-  //Проверка на выбранную матрицу
-  currentTarget(matrix, tableA, tableB) {
-    var array;
-    //проверяем какая матрица выбрана
-    if (matrix == 'a') {
-      array = tableA;
-    } else if (matrix == 'b') array = tableB;
-    return array;
+  toChangeMatrix() {
+    var matrixA = this.state.matrixA,
+        matrixB = this.state.matrixB
+    this.setState({matrixA: matrixB, matrixB: matrixA,});
   },
   render: function() {
-    var arrayTableA = this.state.matrixA;
-    var arrayTableB = this.state.matrixB;
-    //генерируем таблицу Ц
-    var arrayTableCRow = [],
-        arrayTableCColumn = [];
-    for(var i=0; i<this.state.matrixA.length; i++){
-      for(var j=0; j<this.state.matrixB[0].length; j++){
-        arrayTableCColumn[j] = j;
+    var matrixA = this.state.matrixA,
+        matrixB = this.state.matrixB,
+        matrixC,
+        result = this.state.result,
+        matrixTarget = this.state.matrixTarget;
+
+    //генерируем матрицу Ц
+    var matrixCRow = [],
+        matrixCColumn = [];
+    for(var i = 0; i < matrixA.length; i++) {
+      for(var j = 0; j < matrixB[0].length; j++) {
+        matrixCColumn[j] = null;
       }
-      arrayTableCRow[i] = arrayTableCColumn;
+      matrixCRow[i] = matrixCColumn;
     }
-    var arrayTableC = arrayTableCRow;
-    const values = {...this.state.values};
-    //
-    function currentTarget(matrix, tableA, tableB) {
-      var array;
-      //проверяем какая матрица выбрана
-      if (matrix == 'a') {
-        array = tableA;
-      } else if (matrix == 'b') array = tableB;
-      return array;
+    matrixC = matrixCRow;
+    //определяем статус панели
+    function statusBar (matrixA, matrixB) {
+      var statusBar = {};
+      if(matrixA[0].length == matrixB.length) {
+        statusBar['style'] = {'background': '#5199db'};
+      }
+      else {
+        statusBar['style'] = {'background': '#f6c1c0'};
+        statusBar['text'] = 'Такие матрицы нельзя перемножить, так как количество столбцов матрицы А не равно количеству строк матрицы В.';
+      }
+      return statusBar;
     }
     //определяем статус кнопок
-    function statusButton(matrix, tableA, tableB) {
-      var status = {};
-      var array;
-
-      if (matrix == null) {
+    function statusButton(matrixName, matrixA, matrixB) {
+      var status = {},
+          matrix;
+      if(matrixName == null) {
         status['addButton'] = 'disabled';
         status['deleteButton'] = 'disabled';
       }
       else {
-        if (matrix == 'a') {
-          array = tableA;
+        if(matrixName == 'a') {
+          matrix = matrixA;
         }
-        else if (matrix == 'b') array = tableB;
-        var arrayLength = array.length;
+        else if(matrixName == 'b') {
+          matrix = matrixB;
+        }
+        var matrixLength = matrix.length;
 
-        if (arrayLength == 10) {
+        if(matrixLength == 10) {
           status['addButton'] = 'disabled';
         }
         else {
           status['addButton'] = null;
         }
-        if (arrayLength == 2) {
+        if(matrixLength == 2) {
           status['deleteButton'] = 'disabled';
           status['addButton'] = null;
         }
@@ -233,34 +215,20 @@ var Calculator = React.createClass({
       }
       return status;
     }
-    var statusButtonAddRow, statusButtonDeleteRow, statusButtonAddColumn, statusButtonDeleteColumn;
-    statusButtonAddRow = statusButton(this.state.matrixTarget, arrayTableA, arrayTableB)['addButton'];
-    statusButtonDeleteRow = statusButton(this.state.matrixTarget, arrayTableA, arrayTableB)['deleteButton'];
-    statusButtonAddColumn = statusButton(this.state.matrixTarget, arrayTableA[0], arrayTableB[0])['addButton'];
-    statusButtonDeleteColumn = statusButton(this.state.matrixTarget, arrayTableA[0], arrayTableB[0])['deleteButton'];
-
-    //определяем статус кнопок
-    function statusBar (tableA, tableB) {
-      var statusBar = {};
-      if (tableA[0].length == tableB.length) {
-        statusBar['style'] = {'background': '#5199db'};
-      }
-      else {
-        statusBar['style'] = {'background': '#f6c1c0'};
-        statusBar['text'] = 'Такие матрицы нельзя перемножить, так как количество столбцов матрицы А не равно количеству строк матрицы В.';
-      }
-      return statusBar;
-    }
+    var statusButtonAddRow = statusButton(matrixTarget, matrixA, matrixB)['addButton'],
+        statusButtonDeleteRow = statusButton(matrixTarget, matrixA, matrixB)['deleteButton'],
+        statusButtonAddColumn = statusButton(matrixTarget, matrixA[0], matrixB[0])['addButton'],
+        statusButtonDeleteColumn = statusButton(matrixTarget, matrixA[0], matrixB[0])['deleteButton'];
 
     return (
       <div>
-        <div style={statusBar(arrayTableA, arrayTableB)['style']} className="statusBar">
+        <div style={statusBar(matrixA, matrixB)['style']} className="statusBar">
           <div style={{textAlign: 'left', padding: '15px 55px'}}>
-            <button className="result" onClick={this.Result.bind(this, values)}>Умножить матрицы</button>
+            <button className="result" onClick={this.result}>Умножить матрицы</button>
           </div>
           <div style={{textAlign: 'left', padding: '15px 50px'}}>
-            <button className="default" onClick={this.clearMatrix.bind(this, values)}>Очистить матрицы</button><br/>
-            <button className="default" onClick={this.toChangeMatrix.bind(this, values)}>Поменять матрицы местами</button>
+            <button className="default" onClick={this.clearMatrix}>Очистить матрицы</button><br/>
+            <button className="default" onClick={this.toChangeMatrix}>Поменять матрицы местами</button>
           </div>
           <div style={{textAlign: 'left', padding: '15px 50px'}}>
             <input onChange={this.onMatrixChanged} type="radio" name="matrix" value="a" />
@@ -269,16 +237,16 @@ var Calculator = React.createClass({
             <label htmlFor="b">матрица B</label>
           </div>
           <div style={{textAlign: 'left', padding: '15px 50px'}}>
-            <button className="default" disabled={statusButtonAddRow} onClick={this.addRow}>Добавить</button>
-            <button className="default" disabled={statusButtonDeleteRow} onClick={this.deleteRow}>Удалить</button>
+            <button disabled={statusButtonAddRow} className="default" onClick={this.addRow}>Добавить</button>
+            <button disabled={statusButtonDeleteRow} className="default" onClick={this.deleteRow}>Удалить</button>
             <span>строку</span>
           <br/>
-            <button className="default" disabled={statusButtonAddColumn} onClick={this.addColumn}>Добавить</button>
-            <button className="default" disabled={statusButtonDeleteColumn} onClick={this.deleteColumn}>Удалить</button>
+            <button disabled={statusButtonAddColumn} className="default" onClick={this.addColumn}>Добавить</button>
+            <button disabled={statusButtonDeleteColumn} className="default" onClick={this.deleteColumn}>Удалить</button>
             <span>столбец</span>
           </div>
           <div style={{width: '250px', padding: '15px 50px', color: 'red'}}>
-            {statusBar(arrayTableA, arrayTableB)['text']}
+
           </div>
         </div>
         <div style={{display: 'inline-block', 'verticalAlign': 'top'}}>
@@ -288,18 +256,18 @@ var Calculator = React.createClass({
                 <div className="bracket left"></div>
                 <table style={{padding: '4px'}}>
                   <tbody>
-                    {arrayTableC.map((row, rowIndex) => {
+                    {matrixC.map((row, rowIndex) => {
                       return (
                         <tr key={rowIndex} id={rowIndex}>
-                          {row.map((cell, cellIndex) => {
-                            var cellName = 'c' + (rowIndex+1) + ':' + (cellIndex+1);
+                          {row.map((cell, columnIndex) => {
+                            var matrixCellName = rowIndex+':'+columnIndex;
                             return (
-                              <td key={cellIndex} id={cell}>
+                              <td key={columnIndex} id={columnIndex}>
                                 <input
                                 disabled="disabled"
-                                placeholder={'c' + (rowIndex+1) +',' + (cellIndex+1)}
+                                placeholder={'a' + (rowIndex+1) +',' + (columnIndex+1)}
                                 className="tz"
-                                value={values[cellName]} />
+                                value={result[matrixCellName]} />
                               </td>
                             );
                           })}
@@ -314,19 +282,18 @@ var Calculator = React.createClass({
                 <div className="bracket left"></div>
                 <table style={{padding: '4px'}}>
                   <tbody>
-                    {arrayTableA.map((row, rowIndex) => {
+                    {matrixA.map((row, rowIndex) => {
                       return (
                         <tr key={rowIndex} id={rowIndex}>
-                          {row.map((cell, cellIndex) => {
-                            var cellName = 'a' + (rowIndex+1) + ':' + (cellIndex+1);
+                          {row.map((cell, columnIndex) => {
+                            var matrixName = 'matrixA';
                             return (
-                              <td key={cellIndex} id={cell}>
+                              <td key={columnIndex} id={columnIndex}>
                                 <input
-                                ref={'a' + (rowIndex+1) +'_' + (cellIndex+1)}
-                                placeholder={'a' + (rowIndex+1) +',' + (cellIndex+1)}
+                                placeholder={'a' + (rowIndex+1) +',' + (columnIndex+1)}
                                 className="tz"
-                                value={values[cellName]}
-                                onChange={this.handleChange.bind(this, cellName, values)} />
+                                value={cell}
+                                onChange={this.handleChange.bind(this, matrixName, rowIndex, columnIndex)} />
                               </td>
                             );
                           })}
@@ -343,19 +310,18 @@ var Calculator = React.createClass({
                 <div className="bracket left"></div>
                 <table style={{padding: '4px'}}>
                   <tbody>
-                    {arrayTableB.map((row, rowIndex) => {
+                    {matrixB.map((row, rowIndex) => {
                       return (
                         <tr key={rowIndex} id={rowIndex}>
-                          {row.map((cell, cellIndex) => {
-                            var cellName = 'b' + (rowIndex+1) + ':' + (cellIndex+1);
+                          {row.map((cell, columnIndex) => {
+                            var matrixName = 'matrixB';
                             return (
-                              <td key={cellIndex} id={cell}>
+                              <td key={columnIndex} id={columnIndex}>
                                 <input
-                                ref={'b' + (rowIndex+1) +'_' + (cellIndex+1)}
-                                placeholder={'b' + (rowIndex+1) +',' + (cellIndex+1)}
+                                placeholder={'b' + (rowIndex+1) +',' + (columnIndex+1)}
                                 className="tz"
-                                value={values[cellName]}
-                                onChange={this.handleChange.bind(this, cellName, values)} />
+                                value={cell}
+                                onChange={this.handleChange.bind(this, matrixName, rowIndex, columnIndex)} />
                               </td>
                             );
                           })}
